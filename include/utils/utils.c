@@ -1,3 +1,8 @@
+/*
+ * File: utils.c
+ * Project: key text editor
+ * Author: t3cl4do820
+ */
 #include <stdio.h>
 #include "./utils.h"
 

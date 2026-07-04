@@ -1,3 +1,9 @@
+/*
+ * File: interface.c
+ * Project: key text editor
+ * Author: t3cl4do820
+ */
+
 #include <ncurses.h>
 #include "./interface.h"
 
