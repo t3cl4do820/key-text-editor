@@ -1,5 +1,5 @@
 #include <ncurses.h>
-
+#include "./interface.h"
 
 void init_key(void)
 {

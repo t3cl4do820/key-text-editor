@@ -1,7 +1,11 @@
 C_COMPILER=gcc
-OUTPUT_FILE=key
+OUT_PUT_FILE=build/key
 LIB=-lncurses
-OTHER_FILES=key_interface.c key_interface.h
+OTHER_FILES=include/interface/interface.c include/interface/interface.h \
+			include/utils/utils.c include/utils/utils.h
 
 key: key.c
-	$(C_COMPILER) key.c $(OTHER_FILES) -o $(OUTPUT_FILE) $(LIB)
+	$(C_COMPILER) key.c $(OTHER_FILES) $(LIB) -o $(OUT_PUT_FILE)
+
+run:
+	./$(OUT_PUT_FILE) test_file

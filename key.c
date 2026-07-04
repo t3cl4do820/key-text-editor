@@ -5,8 +5,10 @@
 */
 
 #include <stdio.h>
+#include <string.h> // for strlen()
 #include <ncurses.h>
-#include "./key_interface.h"
+#include "include/interface/interface.h"
+#include "include/utils/utils.h"
 
 void init_key_old(char *argv);
 
@@ -15,13 +17,16 @@ void init_new_key();
 int main(int argc, char **argv)
 {
 	if (argc < 2){
-		printf("You need specify the file to open it. \n");
-		init_key_old(NULL);
+		printf("DEBUUUG \n");
 		return 1;
 	}
 
-	init_key_old(argv[1]);
+	char *content = open_file(argv[1]);
+	for (int i = 0; i < strlen(content); i++) {	
+		 printf("%c", content[i]);
+	}
 
+	printf("\n");
 	return 0;
 }
 
