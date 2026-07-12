@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <string.h> // for strlen()
 #include <ncurses.h>
-#include "include/interface/interface.h"
-#include "include/utils/utils.h"
+#include "../include/interface/interface.h"
+#include "../include/utils/utils.h"
 
 void init_key_old(char *argv);
 

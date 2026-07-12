@@ -4,8 +4,8 @@ LIB=-lncurses
 OTHER_FILES=include/interface/interface.c include/interface/interface.h \
 			include/utils/utils.c include/utils/utils.h
 
-key: key.c
-	$(C_COMPILER) key.c $(OTHER_FILES) $(LIB) -o $(OUT_PUT_FILE)
+key: src/key.c
+	@$(C_COMPILER) src/key.c $(OTHER_FILES) $(LIB) -o $(OUT_PUT_FILE) && echo "build successful!"
 
 run:
-	./$(OUT_PUT_FILE) test_file
+	./$(OUT_PUT_FILE) ../test_file
