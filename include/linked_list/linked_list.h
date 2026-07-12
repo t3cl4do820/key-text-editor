@@ -19,7 +19,7 @@ typedef struct List {
 
 void add_line(char *line, List *list);
 
-List* make_list();
+List* makelist();
 
 Node* makenode(char *line);
 

@@ -4,17 +4,33 @@
  * Author: t3cl4do820
  */
 #include <stdio.h>
-#include "./utils.h"
+#include <stdlib.h>
+#include "utils.h"
+#include "../linked_list/linked_list.h"
 
-char buffer[256] = {0};
+#define MAX_LINE_SIZE 256
 
-char* open_file(char *name)
+char buffer[MAX_LINE_SIZE] = {0};
+
+List* read_lines(char *name_file)
 {
-	FILE *file = fopen(name, "r");
-	
-	fread(buffer, 256, 1, file);
+	FILE *file_fd = open_file(name_file);
 
-	// printf("Content: %s \n", buffer);
+	List *list = makelist();
 
-	return buffer;
+	while (fgets(buffer, MAX_LINE_SIZE, file_fd) != 0) {
+		add_line(buffer, list);
+	}
+
+	return list;
+}
+
+FILE* open_file(char *name_file)
+{
+	FILE *file_fd = fopen(name_file, "r");
+	if (file_fd == NULL) {
+		printf("Error to open the file %s\n", name_file); 
+		exit(EXIT_FAILURE);
+	}
+	return file_fd;
 }
