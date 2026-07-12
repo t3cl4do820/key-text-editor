@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h> // for strlen()
 #include <ncurses.h>
-#include "../include/interface/interface.h"
+#include <interface/interface.h>
 
 void init_new_key();
 

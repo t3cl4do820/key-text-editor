@@ -6,7 +6,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 #include <stdio.h>
-#include "../linked_list/linked_list.h"
+#include <linked_list/linked_list.h>
 
 FILE* open_file(char *name_file);
 

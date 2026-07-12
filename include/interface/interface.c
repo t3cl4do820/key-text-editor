@@ -5,7 +5,7 @@
  */
 
 #include <ncurses.h>
-#include "./interface.h"
+#include <interface/interface.h>
 
 void init_key(void)
 {

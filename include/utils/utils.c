@@ -5,8 +5,8 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include "utils.h"
-#include "../linked_list/linked_list.h"
+#include "linked_list/linked_list.h"
+#include <utils/utils.h>
 
 #define MAX_LINE_SIZE 256
 
