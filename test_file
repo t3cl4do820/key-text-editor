@@ -1,10 +1,10 @@
-some
-things
-here
-,
-;
-'
-'
-90
-'
-'
+this is a test file
+
+#include <idk.h>
+
+int main(void)
+{
+	idk_init();
+	idk_close();
+	return 0;
+}

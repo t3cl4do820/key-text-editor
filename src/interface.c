@@ -6,10 +6,24 @@
  * SPDX-License-Identifier: GPL-3.0-only
 */
 
+#include <stdio.h>
 #include <ncurses.h>
 #include <interface/interface.h>
+#include <linked_list/linked_list.h>
 
-void init_key(void)
+void init_key(FILE *file)
+{
+	// read line by line of the file and add in Linked List
+	List *list = makelist();
+
+	char buffer[256]; 
+	while (fgets(buffer, 256, file) != NULL) {
+		add_line(buffer, list);
+		printf("add lines: %s", buffer);
+	}
+}
+
+void _init_key(void)
 {
 	initscr();
 	noecho();

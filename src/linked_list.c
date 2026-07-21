@@ -40,7 +40,6 @@ void delete_line(char *line, List *list)
 			return;
 		}
 		previous = current;
-		current = current->next;
 	}
 }
 
@@ -63,7 +62,7 @@ Node* makenode(char *line)
 		exit(1);
 	}
 	node->line = line;
-	node->size++;
+	node->line_count++;
 	node->next = NULL;
 	return node;
 }

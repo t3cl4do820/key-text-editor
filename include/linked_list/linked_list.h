@@ -11,7 +11,7 @@
 
 typedef struct Node {
 	char *line;
-	int size;
+	int line_count;
 	struct Node *next;
 } Node;
 

@@ -8,18 +8,28 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> // for strlen()
 #include <ncurses.h>
 #include <interface/interface.h>
 
-void init_new_key();
-
 int main(int argc, char **argv)
 {
-	if (argc < 2){
+	if (argc > 2){
 		// open key without text loaded..
 		return EXIT_FAILURE; // lol
 	}
+
+	FILE *file = fopen(argv[1], "r");
+
+	printf("%s \n", argv[1]);
+
+	if (file == NULL) {
+		printf("Cant open the file %s \n", argv[1]);
+		return EXIT_FAILURE;
+	}
+
+	printf("before function \n"	);
+	init_key(file);
+	printf("after function \n");
 
 	return 0;
 }
