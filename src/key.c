@@ -27,9 +27,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	printf("before function \n"	);
 	init_key(file);
-	printf("after function \n");
 
 	return 0;
 }
