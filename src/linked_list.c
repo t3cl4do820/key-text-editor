@@ -61,7 +61,8 @@ Node* makenode(char *line)
 		perror("Error to use malloc in 'makenode' function.");
 		exit(1);
 	}
-	node->line = line;
+	node->line = malloc(strlen(line) + 1);
+	strcpy(node->line, line);
 	node->line_count++;
 	node->next = NULL;
 	return node;

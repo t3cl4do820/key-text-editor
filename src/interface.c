@@ -27,24 +27,41 @@ void init_key(FILE *file)
 
 	int max_lines, max_columns;
 	getmaxyx(stdscr, max_lines, max_columns);
+	int bar_height = 3;
 
-	int window_height = 30;
-	int window_width = 40;
-	int lines_mid = (max_lines - window_height) / 2;
-	int columns_mid = (max_columns- window_width) / 2;
-
-	WINDOW *window = newwin(
-			window_height,
-			window_width,
-			lines_mid,
-			columns_mid	
+	WINDOW *bar = newwin(
+			bar_height,
+			max_columns,
+			max_lines - bar_height,
+			0	
 		);
 
-	box(window, 0, 0);
-	mvwprintw(window, 1, 1, "key text editor");
-	refresh();
-	wrefresh(window);
+	box(bar, 0, 0);
+	mvwprintw(bar, 1, 1, "key text editor");
+	wmove(bar, 1, 16);
 	
+	refresh();
+	wrefresh(bar);
+	
+	getch();
+
+	wmove(bar, 1, 1);
+	wclrtoeol(bar);
+	wrefresh(bar);
+	getch();
+
+	move(0, 0);
+	int row= 0;
+	Node *current = list->head;
+
+	printf("%s", current->line);
+
+	while (current != NULL) {
+		mvprintw(row, 0, "%s", current->line);
+		refresh();
+		current = current->next;
+		row++;
+	}
 	getch();
 	endwin();
 }
