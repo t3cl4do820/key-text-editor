@@ -19,7 +19,6 @@ void init_key(FILE *file)
 	char buffer[256]; 
 	while (fgets(buffer, 256, file) != NULL) {
 		add_line(buffer, list);
-		printf("add lines: %s", buffer);
 	}
 
 	initscr();
@@ -37,24 +36,16 @@ void init_key(FILE *file)
 		);
 
 	box(bar, 0, 0);
-	mvwprintw(bar, 1, 1, "key text editor");
-	wmove(bar, 1, 16);
-	
+
 	refresh();
 	wrefresh(bar);
 	
-	getch();
 
-	wmove(bar, 1, 1);
-	wclrtoeol(bar);
-	wrefresh(bar);
-	getch();
+	// wclrtoeol(bar); // to clear all chars of the line
 
 	move(0, 0);
 	int row= 0;
 	Node *current = list->head;
-
-	printf("%s", current->line);
 
 	while (current != NULL) {
 		mvprintw(row, 0, "%s", current->line);
@@ -62,6 +53,8 @@ void init_key(FILE *file)
 		current = current->next;
 		row++;
 	}
+	move(0, 0);
+	wrefresh(bar);
 	getch();
 	endwin();
 }

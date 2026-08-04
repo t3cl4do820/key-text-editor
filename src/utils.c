@@ -14,19 +14,6 @@
 
 char buffer[MAX_LINE_SIZE] = {0};
 
-List* read_lines(char *name_file)
-{
-	FILE *file_fd = open_file(name_file);
-
-	List *list = makelist();
-
-	while (fgets(buffer, MAX_LINE_SIZE, file_fd) != 0) {
-		add_line(buffer, list);
-	}
-
-	return list;
-}
-
 FILE* open_file(char *name_file)
 {
 	FILE *file_fd = fopen(name_file, "r");

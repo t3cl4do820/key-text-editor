@@ -12,5 +12,4 @@
 
 FILE* open_file(char *name_file);
 
-List* read_lines(char *name_file);
 #endif
