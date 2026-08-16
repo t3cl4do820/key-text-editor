@@ -7,9 +7,16 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ncurses.h>
 #include <interface/interface.h>
 #include <linked_list/linked_list.h>
+
+typedef struct Cursor {
+	int num_column;
+	int num_line;
+	Node *current_line;
+} Cursor;
 
 void init_key(FILE *file)
 {
@@ -20,7 +27,7 @@ void init_key(FILE *file)
 	while (fgets(buffer, 256, file) != NULL) {
 		add_line(buffer, list);
 	}
-
+	
 	initscr();
 	noecho();
 
@@ -40,13 +47,13 @@ void init_key(FILE *file)
 	refresh();
 	wrefresh(bar);
 	
-
 	// wclrtoeol(bar); // to clear all chars of the line
 
 	move(0, 0);
 	int row= 0;
 	Node *current = list->head;
 
+	// print all lines
 	while (current != NULL) {
 		mvprintw(row, 0, "%s", current->line);
 		refresh();
@@ -55,6 +62,25 @@ void init_key(FILE *file)
 	}
 	move(0, 0);
 	wrefresh(bar);
-	getch();
+
+
+	Cursor *current_cursor = malloc(sizeof(Cursor));
+	current_cursor->num_column = 0;
+	current_cursor->num_line = 0;
+	current_cursor->current_line = list->head;
+
+	while (1) {
+		int ch = getch();
+
+		if (ch == 'q') break;
+
+		switch (ch) {
+			case 'l':
+				if (current_cursor->num_column == current_cursor->current_line->size_line -1) continue;
+				current_cursor->num_column++;
+				move(current_cursor->num_line, current_cursor->num_column);
+				break;
+		}
+	}
 	endwin();
 }

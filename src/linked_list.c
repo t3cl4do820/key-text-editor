@@ -64,6 +64,7 @@ Node* makenode(char *line)
 	node->line = malloc(strlen(line) + 1);
 	strcpy(node->line, line);
 	node->line_count++;
+	node->size_line = strlen(line);
 	node->next = NULL;
 	return node;
 }
