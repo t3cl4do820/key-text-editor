@@ -12,11 +12,16 @@
 #include <interface/interface.h>
 #include <linked_list/linked_list.h>
 
+#define HEAD_FILE move(0, 0)
+
 typedef struct Cursor {
 	int num_column;
 	int num_line;
 	Node *current_line;
 } Cursor;
+
+// sorry about that
+static int line_count = 0;
 
 void init_key(FILE *file)
 {
@@ -47,9 +52,9 @@ void init_key(FILE *file)
 	refresh();
 	wrefresh(bar);
 	
-	// wclrtoeol(bar); // to clear all chars of the line
+	// wclrtoeol(bar); // to clear all chars of the line (for dd)
 
-	move(0, 0);
+	HEAD_FILE;
 	int row= 0;
 	Node *current = list->head;
 
@@ -57,21 +62,23 @@ void init_key(FILE *file)
 	while (current != NULL) {
 		mvprintw(row, 0, "%s", current->line);
 		refresh();
-		current = current->next;
 		row++;
+		current = current->next;
+		line_count++;
 	}
-	move(0, 0);
+	current = list->head; // again
+	HEAD_FILE;
 	wrefresh(bar);
 
-
+	// init the cursor
 	Cursor *current_cursor = malloc(sizeof(Cursor));
 	current_cursor->num_column = 0;
 	current_cursor->num_line = 0;
 	current_cursor->current_line = list->head;
 
+	// the cursor move a column forward because the NULL char btw
 	while (1) {
 		int ch = getch();
-
 		if (ch == 'q') break;
 
 		switch (ch) {
@@ -80,6 +87,15 @@ void init_key(FILE *file)
 				current_cursor->num_column++;
 				move(current_cursor->num_line, current_cursor->num_column);
 				break;
+			case 'h':
+				if (current_cursor->num_column == 0) continue;
+				current_cursor->num_column--;
+				move(current_cursor->num_line, current_cursor->num_column);
+				break;
+			case 'j':
+				if (current_cursor->num_line == line_count - 1) continue;
+				current_cursor->num_line++;
+				move(current_cursor->num_line, current_cursor->num_column);
 		}
 	}
 	endwin();

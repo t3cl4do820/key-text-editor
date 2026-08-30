@@ -1,11 +1,11 @@
-test again
-this is a test file
+test file
 
 #include <idk.h>
 
+
 int main(void)
 {
-	idk_init();
-	idk_close();
+	idk_run();
 	return 0;
 }
+
