@@ -11,6 +11,7 @@
 #include <ncurses.h>
 #include <interface/interface.h>
 #include <linked_list/linked_list.h>
+#include <string.h>
 
 #define HEAD_FILE move(0, 0)
 
@@ -76,7 +77,9 @@ void init_key(FILE *file)
 	current_cursor->num_line = 0;
 	current_cursor->current_line = list->head;
 
+
 	// the cursor move a column forward because the NULL char btw
+	int max_col;
 	while (1) {
 		int ch = getch();
 		if (ch == 'q') break;
@@ -93,9 +96,27 @@ void init_key(FILE *file)
 				move(current_cursor->num_line, current_cursor->num_column);
 				break;
 			case 'j':
-				if (current_cursor->num_line == line_count - 1) continue;
+				if (current_cursor->num_line == line_count - 2) continue;
+				current_cursor->current_line = current_cursor->current_line->next;
 				current_cursor->num_line++;
+
+				max_col = current_cursor->current_line->size_line - 1;
+				if (max_col < 0) max_col = 0;
+				if (current_cursor->num_column > max_col)
+					current_cursor->num_column = max_col;
 				move(current_cursor->num_line, current_cursor->num_column);
+				break;
+			case 'k':
+				if (current_cursor->num_line == 0) continue;
+				current_cursor->current_line = current_cursor->current_line->previous;
+				current_cursor->num_line--;
+
+				max_col = current_cursor->current_line->size_line - 1;
+				if (max_col < 0) max_col = 0;
+				if (current_cursor->num_column > max_col)
+					current_cursor->num_column = max_col;
+				move(current_cursor->num_line, current_cursor->num_column);
+				break;
 		}
 	}
 	endwin();

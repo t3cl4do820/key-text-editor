@@ -22,5 +22,7 @@ To execute use `make run`.
 
 License: [GNU General Public License (GPL) v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
 
+This editor does not support tabs
+
 </small>
 </i>

@@ -5,7 +5,7 @@ test file
 
 int main(void)
 {
-	idk_run();
-	return 0;
+    idk_run();
+    return 0;
 }
 

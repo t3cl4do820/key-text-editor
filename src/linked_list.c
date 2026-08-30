@@ -22,6 +22,7 @@ void add_line(char *line, List *list)
 			current = current->next;
 		}
 		current->next = makenode(line);
+		current->next->previous = current;
 	}
 }
 
@@ -36,10 +37,12 @@ void delete_line(char *line, List *list)
 			} else {
 				previous->next = current->next;
 			}
+			free(current->line);
 			free(current);
 			return;
 		}
 		previous = current;
+		current = current->next;
 	}
 }
 
@@ -65,6 +68,7 @@ Node* makenode(char *line)
 	strcpy(node->line, line);
 	node->size_line = strlen(line);
 	node->next = NULL;
+	node->previous = NULL;
 	return node;
 }
 
