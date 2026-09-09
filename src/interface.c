@@ -24,6 +24,22 @@ typedef struct Cursor {
 // sorry about that
 static int line_count = 0;
 
+// to exit use backspace or DEL char = 127
+void command_mode(WINDOW *bar)
+{
+	mvwprintw(bar, 1, 1, ":");
+	wrefresh(bar);
+	char buffer[5];
+ 	getstr(buffer);
+	wrefresh(bar);
+	printf("%s", buffer);
+	/*
+ 	int c = getch();
+	mvwprintw(bar, 1, 2, "%c", c);
+	wrefresh(bar);
+	*/
+}
+
 void init_key(FILE *file)
 {
 	// read line by line of the file and add in Linked List
@@ -117,7 +133,13 @@ void init_key(FILE *file)
 					current_cursor->num_column = max_col;
 				move(current_cursor->num_line, current_cursor->num_column);
 				break;
+			case ':':
+				command_mode(bar);
+				break;
 		}
+
 	}
 	endwin();
 }
+
+
