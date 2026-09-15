@@ -14,6 +14,7 @@
 #include <string.h>
 
 #define HEAD_FILE move(0, 0)
+#define CMD_SIZE 5
 
 typedef struct Cursor {
 	int num_column;
@@ -24,20 +25,59 @@ typedef struct Cursor {
 // sorry about that
 static int line_count = 0;
 
+// w, q, wq, wq! only
+void lookup_command(char command[CMD_SIZE])
+{
+	if (strcmp(command, "q") == 0) {
+		endwin();
+		exit(0);
+	}
+}
+
+// ta dando muita merda, dps voce tenta escrever tudo dentro de uma window, acho que assim fica mais facil de manipular os elementos...
+// tu vai ter que mudar a barra tbm, fazer igual a do vim
+
 // to exit use backspace or DEL char = 127
 void command_mode(WINDOW *bar)
 {
 	mvwprintw(bar, 1, 1, ":");
 	wrefresh(bar);
-	char buffer[5];
- 	getstr(buffer);
-	wrefresh(bar);
-	printf("%s", buffer);
-	/*
- 	int c = getch();
-	mvwprintw(bar, 1, 2, "%c", c);
-	wrefresh(bar);
-	*/
+	// char buffer[CMD_SIZE];
+
+	int ch;
+
+	// nao to conseguindo fazer a mecanica de mostrar o que foi digitado usando o getch nesse loop ai
+	// preciso coletar o input (que eh uma array) usando o getch
+
+	// while ((ch = getch())) {
+		mvprintw(1, 1, "daraa");	
+	// }
+
+	// for (int i = 0; i < CMD_SIZE; i++) {
+	// 	while ((ch = getch())) {
+	// 		// esc, backspace, del
+	// 		switch (ch) {
+	// 			case 27: // esc 
+	// 				break;
+	//
+	// 			case 127: // del
+	//
+	// 				break;
+	//
+	// 			case 8: // backspace
+	//
+	// 				break;
+	//
+	// 			case 13: // parse the command
+	// 				lookup_command(buffer);
+	// 				break;
+	//
+	// 			default:
+	// 				buffer[i] = ch;
+	// 				break;
+	// 		}			
+	// 	}
+	// }
 }
 
 void init_key(FILE *file)
