@@ -8,8 +8,5 @@
 #ifndef KEY_INTERFACE
 #define KEY_INTERFACE
 
-#include <stdio.h>
-
-void init_key(FILE *file);
 
 #endif

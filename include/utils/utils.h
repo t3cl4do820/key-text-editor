@@ -10,6 +10,6 @@
 #include <stdio.h>
 #include <linked_list/linked_list.h>
 
-FILE* open_file(char *name_file);
+
 
 #endif
