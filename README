@@ -1,0 +1,27 @@
+key text editor
+---------------
+
+Is a simple text editor written in C using termios, this editor is based on VIM and uses some keybindings, for example 'h', 'j', 'k', 'l' and others.
+
+Dependencies
+------------
+	C11
+	Standard Headers
+	makefile
+
+Compile
+-------
+
+Just run 'make' in root directory.
+
+To execute use 'make run'.
+
+Warning
+-------
+THIS IS A PERSONAL PROJECT TO IMPROVE MY KNOWLEDGE IN C LANGUAGE.
+
+License 
+-------
+
+GNU General Public License (GPL) v3.0 
+https://www.gnu.org/licenses/gpl-3.0.html
