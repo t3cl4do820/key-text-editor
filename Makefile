@@ -2,7 +2,7 @@ C_COMPILER=gcc
 OUT_PUT_FILE=build/key
 LIB=-lncurses
 INCLUDE=-Iinclude
-OTHER_FILES= src/utils.c src/linked_list.c src/interface.c
+OTHER_FILES= src/linked_list.c
 
 OUT_PUT_LINUX=/usr/local/bin/key
 
