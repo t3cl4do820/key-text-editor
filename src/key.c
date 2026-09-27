@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &new_term);
 
 	/* Draw the Window */
-	write(STDOUT_FILENO, "\x1b[2J", 4); /* Clear the window */
+	write(STDOUT_FILENO, "\x1b[?1049h", 8); /* Enter in alternative window */
 
 	write(STDOUT_FILENO, "\x1b[1;1H", 6); /* Move the cursor */
 
@@ -51,13 +51,15 @@ int main(int argc, char **argv)
 	char c;
 	read(STDIN_FILENO, &c, 1);
 
+	write(STDOUT_FILENO, "\x1b[?1049l", 8); /* Back to the window */
+
 	/* Exit */
-	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &old_term) == -1) {	
+	if (tcsetattr(STDIN_FILENO, TCSANOW, &old_term) == -1) {	
 		fprintf(stderr, "Error to restore the terminal configs \n");
 		return -1;
 	}
 
-	printf("%c \n", c);
+	printf("%c", c);
 
 	return 0;
 }
