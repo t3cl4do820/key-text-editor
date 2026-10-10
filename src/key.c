@@ -15,16 +15,20 @@
 #include <sys/ioctl.h>
 #include <linked_list.h>
 
-struct Terminal {
+static int read_only = 0;
+
+struct TermConfig {
 	int rows, columns;
 };
+
+static struct termios old_term, new_term;
 
 struct Cursor {
 	int x, y;
 	Node *current_line;
 };
 
-void enable_raw_mode(struct termios *term)
+static void enable_raw_mode(struct termios *term)
 {
 	term->c_iflag &= ~(ICRNL | IXON | BRKINT | INPCK | ISTRIP); 
 	term->c_oflag &= ~(OPOST);
@@ -34,30 +38,59 @@ void enable_raw_mode(struct termios *term)
 	term->c_cc[VTIME] = 0; /* wait for a byte to read it */
 }
 
-struct Terminal set_terminal_config(void)
+static struct TermConfig set_terminal_config(void)
 {
 	struct winsize ws;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
-	return (struct Terminal) {
+	return (struct TermConfig) {
 		.rows = ws.ws_row,
 		.columns = ws.ws_col,
 	};
 }
 
-int main(int argc, char **argv)
+static void editor_process_key()
 {
-	struct termios old_term, new_term;
+	/* read something */
+	char c;
+	while (1) {
+		read(STDIN_FILENO, &c, 1);
+		switch (c) {
+			case 'q':
+				write(STDOUT_FILENO, "\x1b[?1049l", 8); /* Back to the window */
 
+				/* exit */
+				if (tcsetattr(STDIN_FILENO, TCSANOW, &old_term) == -1) {	
+					fprintf(stderr, "Error to restore the terminal configs \n");
+					exit(1);
+				}
+				exit(0);
+				break;
+			default:
+				write(STDOUT_FILENO, &c, sizeof(char));
+		}
+	}
+}
+
+static void help()
+{
+	printf(
+		""
+		);
+}
+
+/* int for errors */
+static void init_editor()
+{
 	if (tcgetattr(STDIN_FILENO, &old_term) == -1) {
 		fprintf(stderr, "Error to save the old terminal configs \n");
-		return -1;
+		exit(1);
 	}
 	
 	new_term = old_term;
 
 	enable_raw_mode(&new_term);
 	
-	struct Terminal t = set_terminal_config();
+	struct TermConfig t = set_terminal_config();
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &new_term);
 
 	/* Draw the Window */
@@ -65,24 +98,33 @@ int main(int argc, char **argv)
 
 	write(STDOUT_FILENO, "\x1b[1;1H", 6); /* Move the cursor */
 
-	/* read some thing */
-	char c;
-	while (1) {
-		read(STDIN_FILENO, &c, 1);
-		write(STDOUT_FILENO, &c, sizeof(char));
-		if (c == 'q')
-			break;
+	editor_process_key();
+}
+
+static void editor_open(const char *file_name)
+{
+
+}
+
+static void editor_open_empty(void)
+{
+
+}
+
+
+int main(int argc, char **argv)
+{
+	if (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0) {
+		help();
+		return 0;
+	}
+	init_editor(); /* set the configs */
+	if (argc >= 2) {
+		editor_open(argv[1]);
+		return 0;
 	}
 
-	write(STDOUT_FILENO, "\x1b[?1049l", 8); /* Back to the window */
+	editor_open_empty();
 
-	/* exit */
-	if (tcsetattr(STDIN_FILENO, TCSANOW, &old_term) == -1) {	
-		fprintf(stderr, "Error to restore the terminal configs \n");
-		return -1;
-	}
-
-	printf("%c \n", c);
-	printf("%d %d \n", t.rows, t.columns);
 	return 0;
 }
