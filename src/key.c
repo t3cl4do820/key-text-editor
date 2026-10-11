@@ -33,10 +33,10 @@ static struct termios old_term, new_term;
 static void parse_flags(int argc, const char **argv);
 static void enable_raw_mode(struct termios *term);
 static struct TermConfig set_terminal_config(void);
-static void editor_process_key();
+static void editor_process_key(List *list);
 static void help();
 static void init_editor();
-static void editor_open(const char *file_name);
+static void editor_open(const char *file_name, List *list);
 static void editor_open_empty(void);
 
 void parse_flags(int argc, const char **argv)
@@ -76,9 +76,9 @@ struct TermConfig set_terminal_config(void)
 	};
 }
 
-void editor_process_key()
+void editor_process_key(List *list)
 {
-	List *list = makelist(); /* From linked_list.h */
+
 	int num_line = 0, num_column = 0;
 	struct Cursor *current_cursor = malloc(sizeof(struct Cursor));
 	current_cursor->line = num_line;
@@ -104,17 +104,20 @@ void editor_process_key()
 				write(STDOUT_FILENO, &c, sizeof(char));
 		}
 	}
-	free(list);
 }
 
 void help()
 {
 	puts(
-		""
+		"Key text editor By t3cl4do820 \n\n"
+		"Flags: \n"
+			"\t--help      | -h => This message \n"
+			"\t--version   | -v => See key version \n"
+			"\t--read-only | -r => Open a file to read only \n"
 		);
 }
 
-/* int for errors */
+/* set configs */
 void init_editor()
 {
 	if (tcgetattr(STDIN_FILENO, &old_term) == -1) {
@@ -133,11 +136,9 @@ void init_editor()
 	write(STDOUT_FILENO, "\x1b[?1049h", 8); /* Enter in alternative buffer */
 
 	write(STDOUT_FILENO, "\x1b[1;1H", 6); /* Move the cursor */
-
-	editor_process_key();
 }
 
-void editor_open(const char *file_name)
+void editor_open(const char *file_name, List *list)
 {
 	FILE *fp = fopen(file_name, "w");
 	if (fp == NULL) {
@@ -146,6 +147,15 @@ void editor_open(const char *file_name)
 				file_name, __func__, __LINE__);
 		exit(1);
 	}
+
+	/* read the file content and add in linked list */
+
+	char buffer[256]; /* 256 bytes by line */
+	while (fgets(buffer, 256, fp) != NULL) {
+		add_line(buffer, list);
+	}
+	
+	editor_process_key(list);
 }
 
 void editor_open_empty(void)
@@ -159,7 +169,8 @@ int main(int argc, char **argv)
 	parse_flags(argc, (const char **)argv);
 	init_editor(); /* set the configs */
 	if (argc >= 2) {
-		editor_open(argv[1]);
+		List *list = makelist();
+		editor_open(argv[1], list);
 		return 0;
 	}
 
