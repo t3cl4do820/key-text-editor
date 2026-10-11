@@ -15,20 +15,48 @@
 #include <sys/ioctl.h>
 #include <linked_list.h>
 
-static int read_only = 0;
+#define VERSION "0.0.1"
 
 struct TermConfig {
 	int rows, columns;
 };
 
-static struct termios old_term, new_term;
-
 struct Cursor {
-	int x, y;
+	int line, column;
 	Node *current_line;
 };
 
-static void enable_raw_mode(struct termios *term)
+static int read_only = 0;
+
+static struct termios old_term, new_term;
+
+static void parse_flags(int argc, const char **argv);
+static void enable_raw_mode(struct termios *term);
+static struct TermConfig set_terminal_config(void);
+static void editor_process_key();
+static void help();
+static void init_editor();
+static void editor_open(const char *file_name);
+static void editor_open_empty(void);
+
+void parse_flags(int argc, const char **argv)
+{
+	for (int i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
+			help();
+			exit(0);
+		}
+		if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
+			printf("Key version: %s \nBy t3cl4do820 \n", VERSION);
+			exit(0);
+		}
+		if (strcmp(argv[i], "--read-only") == 0 || strcmp(argv[i], "-r") == 0) {
+			read_only = 1;
+		}
+	}
+}
+
+void enable_raw_mode(struct termios *term)
 {
 	term->c_iflag &= ~(ICRNL | IXON | BRKINT | INPCK | ISTRIP); 
 	term->c_oflag &= ~(OPOST);
@@ -38,7 +66,7 @@ static void enable_raw_mode(struct termios *term)
 	term->c_cc[VTIME] = 0; /* wait for a byte to read it */
 }
 
-static struct TermConfig set_terminal_config(void)
+struct TermConfig set_terminal_config(void)
 {
 	struct winsize ws;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
@@ -48,8 +76,15 @@ static struct TermConfig set_terminal_config(void)
 	};
 }
 
-static void editor_process_key()
+void editor_process_key()
 {
+	List *list = makelist(); /* From linked_list.h */
+	int num_line = 0, num_column = 0;
+	struct Cursor *current_cursor = malloc(sizeof(struct Cursor));
+	current_cursor->line = num_line;
+	current_cursor->column = num_column;
+	current_cursor->current_line = list->head;
+
 	/* read something */
 	char c;
 	while (1) {
@@ -69,17 +104,18 @@ static void editor_process_key()
 				write(STDOUT_FILENO, &c, sizeof(char));
 		}
 	}
+	free(list);
 }
 
-static void help()
+void help()
 {
-	printf(
+	puts(
 		""
 		);
 }
 
 /* int for errors */
-static void init_editor()
+void init_editor()
 {
 	if (tcgetattr(STDIN_FILENO, &old_term) == -1) {
 		fprintf(stderr, "Error to save the old terminal configs \n");
@@ -101,12 +137,18 @@ static void init_editor()
 	editor_process_key();
 }
 
-static void editor_open(const char *file_name)
+void editor_open(const char *file_name)
 {
-
+	FILE *fp = fopen(file_name, "w");
+	if (fp == NULL) {
+		fprintf(stderr,
+				"Error to open the file: %s \nIn function %s At line: %d",
+				file_name, __func__, __LINE__);
+		exit(1);
+	}
 }
 
-static void editor_open_empty(void)
+void editor_open_empty(void)
 {
 
 }
@@ -114,10 +156,7 @@ static void editor_open_empty(void)
 
 int main(int argc, char **argv)
 {
-	if (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0) {
-		help();
-		return 0;
-	}
+	parse_flags(argc, (const char **)argv);
 	init_editor(); /* set the configs */
 	if (argc >= 2) {
 		editor_open(argv[1]);
