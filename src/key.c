@@ -30,6 +30,8 @@ static int read_only = 0;
 
 static struct termios old_term, new_term;
 
+static int line_count = 0;
+
 static void parse_flags(int argc, const char **argv);
 static void enable_raw_mode(struct termios *term);
 static struct TermConfig set_terminal_config(void);
@@ -37,7 +39,15 @@ static void editor_process_key(List *list);
 static void help();
 static void init_editor();
 static void editor_open(const char *file_name, List *list);
-static void editor_open_empty(void);
+static void editor_open_empty(List *list);
+static void exit_and_restore_t();
+
+/* for errors */
+static void exit_and_restore_t()
+{
+	tcsetattr(STDOUT_FILENO, TCSANOW, &old_term);
+	exit(1);
+}
 
 void parse_flags(int argc, const char **argv)
 {
@@ -96,7 +106,7 @@ void editor_process_key(List *list)
 				/* exit */
 				if (tcsetattr(STDIN_FILENO, TCSANOW, &old_term) == -1) {	
 					fprintf(stderr, "Error to restore the terminal configs \n");
-					exit(1);
+					exit_and_restore_t();
 				}
 				exit(0);
 				break;
@@ -122,7 +132,7 @@ void init_editor()
 {
 	if (tcgetattr(STDIN_FILENO, &old_term) == -1) {
 		fprintf(stderr, "Error to save the old terminal configs \n");
-		exit(1);
+		exit_and_restore_t();
 	}
 	
 	new_term = old_term;
@@ -145,7 +155,7 @@ void editor_open(const char *file_name, List *list)
 		fprintf(stderr,
 				"Error to open the file: %s \nIn function %s At line: %d",
 				file_name, __func__, __LINE__);
-		exit(1);
+		exit_and_restore_t();
 	}
 
 	/* read the file content and add in linked list */
@@ -154,13 +164,23 @@ void editor_open(const char *file_name, List *list)
 	while (fgets(buffer, 256, fp) != NULL) {
 		add_line(buffer, list);
 	}
+
+	Node *current = list->head;
+	/* not working */
+	while (current != NULL) {
+		write(STDOUT_FILENO, current->line, current->size_line);
+		current = current->next;
+		line_count++;
+	}
+	current = list->head; /* back to head */
 	
 	editor_process_key(list);
 }
 
-void editor_open_empty(void)
+void editor_open_empty(List *list)
 {
-
+	
+	editor_process_key(list);
 }
 
 
@@ -168,13 +188,13 @@ int main(int argc, char **argv)
 {
 	parse_flags(argc, (const char **)argv);
 	init_editor(); /* set the configs */
-	if (argc >= 2) {
-		List *list = makelist();
+	List *list = makelist();
+	if (argc >= 3) {
 		editor_open(argv[1], list);
 		return 0;
 	}
 
-	editor_open_empty();
+	editor_open_empty(list);
 
 	return 0;
 }
