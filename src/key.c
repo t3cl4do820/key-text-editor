@@ -163,7 +163,7 @@ void init_editor()
 
 void editor_open(const char *file_name, List *list)
 {
-	FILE *fp = fopen(file_name, "w");
+	FILE *fp = fopen(file_name, "r");
 	if (fp == NULL) {
 		fprintf(stderr,
 				"Error to open the file: %s \nIn function %s At line: %d",
@@ -177,11 +177,12 @@ void editor_open(const char *file_name, List *list)
 	while (fgets(buffer, 256, fp) != NULL) {
 		add_line(buffer, list);
 	}
+	fclose(fp);
 
 	Node *current = list->head;
-	/* not working */
 	while (current != NULL) {
 		write(STDOUT_FILENO, current->line, current->size_line);
+		write(STDOUT_FILENO, "\r", 1);
 		current = current->next;
 		line_count++;
 	}
