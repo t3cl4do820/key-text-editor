@@ -22,7 +22,7 @@ struct TermConfig {
 };
 
 struct Cursor {
-	int line, column;
+	int num_line, num_column;
 	Node *current_line;
 };
 
@@ -104,12 +104,13 @@ void editor_process_key(List *list)
 
 	int num_line = 0, num_column = 0;
 	struct Cursor *current_cursor = malloc(sizeof(struct Cursor));
-	current_cursor->line = num_line;
-	current_cursor->column = num_column;
+	current_cursor->num_line = num_line;
+	current_cursor->num_column = num_column;
 	current_cursor->current_line = list->head;
 
-	/* read something */
+	/* read char */
 	char c;
+	int max_col;
 	while (1) {
 		read(STDIN_FILENO, &c, 1);
 		switch (c) {
@@ -123,8 +124,44 @@ void editor_process_key(List *list)
 				}
 				exit(0);
 				break;
+
+			case 'l':
+				if (current_cursor->num_column == current_cursor->current_line->size_line -1) continue;
+				current_cursor->num_column++;
+				write(STDOUT_FILENO, "\x1b[1C", 4);
+				break;
+			case 'h':
+				if (current_cursor->num_column == 0) continue;
+				current_cursor->num_column--;
+				write(STDOUT_FILENO, "\x1b[1D", 4);
+				break;
+			case 'j':
+				if (current_cursor->num_line == line_count - 2) continue;
+				current_cursor->current_line = current_cursor->current_line->next;
+				current_cursor->num_line++;
+	
+				max_col = current_cursor->current_line->size_line - 1;
+				if (max_col < 0) max_col = 0;
+				if (current_cursor->num_column > max_col)
+					current_cursor->num_column = max_col;
+				write(STDOUT_FILENO, "\x1b[1B", 4);
+				break;
+			case 'k':
+				if (current_cursor->num_line == 0) continue;
+				current_cursor->current_line = current_cursor->current_line->previous;
+				current_cursor->num_line--;
+
+				max_col = current_cursor->current_line->size_line - 1;
+				if (max_col < 0) max_col = 0;
+				if (current_cursor->num_column > max_col)
+					current_cursor->num_column = max_col;
+				write(STDOUT_FILENO, "\x1b[1A", 4);
+				break;
+			case ':':
+
+				break;
 			default:
-				write(STDOUT_FILENO, &c, sizeof(char));
+				write(STDOUT_FILENO, &c, sizeof(char)); /* print the char */
 		}
 	}
 }
@@ -187,7 +224,9 @@ void editor_open(const char *file_name, List *list)
 		line_count++;
 	}
 	current = list->head; /* back to head */
-	
+
+	write(STDOUT_FILENO, "\x1b[1;1H", 6);
+
 	editor_process_key(list);
 }
 
