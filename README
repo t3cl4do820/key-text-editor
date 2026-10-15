@@ -5,9 +5,10 @@ Is a simple text editor written in C using termios, this editor is based on VIM 
 
 Dependencies
 ------------
-	C99
-	Standard Headers
-	makefile
+
+* C99
+* Standard Headers
+* makefile
 
 Compile
 -------
