@@ -36,14 +36,14 @@ static void parse_flags(int argc, const char **argv);
 static void enable_raw_mode(struct termios *term);
 static struct TermConfig set_terminal_config(void);
 static void editor_process_key(List *list);
-static void help();
-static void init_editor();
+static void help(void);
+static void init_editor(void);
 static void editor_open(const char *file_name, List *list);
 static void editor_open_empty(List *list);
-static void exit_and_restore_t();
+static void exit_and_restore_t(void);
 
 /* for errors */
-static void exit_and_restore_t()
+void exit_and_restore_t()
 {
 	tcsetattr(STDOUT_FILENO, TCSANOW, &old_term);
 	exit(1);
@@ -51,7 +51,12 @@ static void exit_and_restore_t()
 
 void parse_flags(int argc, const char **argv)
 {
+	char flag[] = "";
+	int flag_exist = 0;
 	for (int i = 1; i < argc; i++) {
+		if (argv[i][0] != '-')
+			continue;
+
 		if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
 			help();
 			exit(0);
@@ -62,8 +67,16 @@ void parse_flags(int argc, const char **argv)
 		}
 		if (strcmp(argv[i], "--read-only") == 0 || strcmp(argv[i], "-r") == 0) {
 			read_only = 1;
+			return;
 		}
+		flag_exist = 1;
+		strcpy(flag, argv[i]);
 	}
+	if (flag_exist == 1) {
+		fprintf(stderr, "Flag: %s not found! \n", flag);
+		exit(1);
+	}
+	return;
 }
 
 void enable_raw_mode(struct termios *term)
@@ -119,7 +132,7 @@ void editor_process_key(List *list)
 void help()
 {
 	puts(
-		"Key text editor By t3cl4do820 \n\n"
+		"Key text editor by t3cl4do820 \n\n"
 		"Flags: \n"
 			"\t--help      | -h => This message \n"
 			"\t--version   | -v => See key version \n"
@@ -189,7 +202,7 @@ int main(int argc, char **argv)
 	parse_flags(argc, (const char **)argv);
 	init_editor(); /* set the configs */
 	List *list = makelist();
-	if (argc >= 3) {
+	if (argc >= 2) {
 		editor_open(argv[1], list);
 		return 0;
 	}
