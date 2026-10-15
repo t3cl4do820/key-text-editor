@@ -14,7 +14,7 @@ Compile
 
 Just run 'make' in root directory.
 
-To execute use 'make run'.
+To execute use './build/key' or 'make global'.
 
 Warning
 -------
