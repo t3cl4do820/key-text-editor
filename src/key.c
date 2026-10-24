@@ -27,10 +27,9 @@ struct Cursor {
 };
 
 static int read_only = 0;
-
 static struct termios old_term, new_term;
-
 static int line_count = 0;
+static struct TermConfig t;
 
 static void parse_flags(int argc, const char **argv);
 static void enable_raw_mode(struct termios *term);
@@ -41,6 +40,16 @@ static void init_editor(void);
 static void editor_open(const char *file_name, List *list);
 static void editor_open_empty(List *list);
 static void exit_and_restore_t(void);
+static void move_cursor(int line, int column);
+
+void move_cursor(int line, int column)
+{
+	char ansi_code[32];
+	int len = snprintf(ansi_code, sizeof(ansi_code), "\x1b[%d;%dH", line, column);
+	if (len > 0) {
+		write(STDOUT_FILENO, ansi_code, (size_t)len);
+	}
+}
 
 /* for errors */
 void exit_and_restore_t()
@@ -109,6 +118,7 @@ void editor_process_key(List *list)
 	current_cursor->current_line = list->head;
 
 	/* read char */
+	/* notes: 1-based (+1 in move_cursor function) */
 	char c;
 	int max_col;
 	while (1) {
@@ -124,18 +134,20 @@ void editor_process_key(List *list)
 				}
 				exit(0);
 				break;
-
 			case 'l':
 				if (current_cursor->num_column == current_cursor->current_line->size_line -1) continue;
 				current_cursor->num_column++;
-				write(STDOUT_FILENO, "\x1b[1C", 4);
+				// write(STDOUT_FILENO, "\x1b[1C", 4);
+				move_cursor(current_cursor->num_line + 1, current_cursor->num_column + 1);
 				break;
 			case 'h':
 				if (current_cursor->num_column == 0) continue;
 				current_cursor->num_column--;
-				write(STDOUT_FILENO, "\x1b[1D", 4);
+				// write(STDOUT_FILENO, "\x1b[1D", 4);
+				move_cursor(current_cursor->num_line + 1, current_cursor->num_column + 1);
 				break;
 			case 'j':
+				/* verificar quando o cursor descer e ele estiver fora do range (coluna fora do tamanaho da linha, se estiver o cursor vai pro final da lina) */
 				if (current_cursor->num_line == line_count - 2) continue;
 				current_cursor->current_line = current_cursor->current_line->next;
 				current_cursor->num_line++;
@@ -144,7 +156,8 @@ void editor_process_key(List *list)
 				if (max_col < 0) max_col = 0;
 				if (current_cursor->num_column > max_col)
 					current_cursor->num_column = max_col;
-				write(STDOUT_FILENO, "\x1b[1B", 4);
+				// write(STDOUT_FILENO, "\x1b[1B", 4);
+				move_cursor(current_cursor->num_line + 1, current_cursor->num_column + 1);
 				break;
 			case 'k':
 				if (current_cursor->num_line == 0) continue;
@@ -155,7 +168,8 @@ void editor_process_key(List *list)
 				if (max_col < 0) max_col = 0;
 				if (current_cursor->num_column > max_col)
 					current_cursor->num_column = max_col;
-				write(STDOUT_FILENO, "\x1b[1A", 4);
+				// write(STDOUT_FILENO, "\x1b[1A", 4);
+				move_cursor(current_cursor->num_line + 1, current_cursor->num_column + 1);
 				break;
 			case ':':
 
@@ -189,7 +203,7 @@ void init_editor()
 
 	enable_raw_mode(&new_term);
 	
-	struct TermConfig t = set_terminal_config();
+	t = set_terminal_config();
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &new_term);
 
 	/* Draw the Window */
