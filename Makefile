@@ -1,6 +1,6 @@
 C_COMPILER=gcc
 OUT_PUT_FILE=build/key
-COMPILE_FLAGS=-std=c99 -Iinclude -Wall -Wextra
+COMPILE_FLAGS=-std=c99 -Iinclude -Wall -Wextra -g
 OTHER_FILES= src/linked_list.c
 
 key: src/key.c

@@ -30,6 +30,7 @@ static int read_only = 0;
 static struct termios old_term, new_term;
 static int line_count = 0;
 static struct TermConfig t;
+static int editor_empty = 0; /* remove this */
 
 static void parse_flags(int argc, const char **argv);
 static void enable_raw_mode(struct termios *term);
@@ -110,7 +111,6 @@ struct TermConfig set_terminal_config(void)
 
 void editor_process_key(List *list)
 {
-
 	int num_line = 0, num_column = 0;
 	struct Cursor *current_cursor = malloc(sizeof(struct Cursor));
 	current_cursor->num_line = num_line;
@@ -135,6 +135,7 @@ void editor_process_key(List *list)
 				exit(0);
 				break;
 			case 'l':
+				if (editor_empty == 1) continue; /* remove this */
 				if (current_cursor->num_column == current_cursor->current_line->size_line -1) continue;
 				current_cursor->num_column++;
 				// write(STDOUT_FILENO, "\x1b[1C", 4);
@@ -147,8 +148,9 @@ void editor_process_key(List *list)
 				move_cursor(current_cursor->num_line + 1, current_cursor->num_column + 1);
 				break;
 			case 'j':
-				/* verificar quando o cursor descer e ele estiver fora do range (coluna fora do tamanaho da linha, se estiver o cursor vai pro final da lina) */
+				if (editor_empty == 1) continue; /* remove this */
 				if (current_cursor->num_line == line_count - 2) continue;
+				// if (current_cursor->current_line->next == NULL) continue;
 				current_cursor->current_line = current_cursor->current_line->next;
 				current_cursor->num_line++;
 	
@@ -246,7 +248,7 @@ void editor_open(const char *file_name, List *list)
 
 void editor_open_empty(List *list)
 {
-	
+	editor_empty = 1; /* remove this */
 	editor_process_key(list);
 }
 
